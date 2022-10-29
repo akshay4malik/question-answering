@@ -1,0 +1,10 @@
+bentoml~=0.12.1
+ignite-lume>=1.9.3,<2
+ignite-bentoml>=0.2,<1
+torch>=1.5.1,<1.10
+tokenizers==0.10.3
+transformers==4.16.2
+datasets>=1.18,<2
+scikit-learn>=0.23,<1
+tqdm>=4.48.2,<5
+onnxruntime==1.7.0

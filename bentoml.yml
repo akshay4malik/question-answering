@@ -1,0 +1,103 @@
+version: 0.12.0
+kind: BentoService
+metadata:
+  created_at: 2021-04-02 20:39:16.898439
+  service_name: QAModel
+  service_version: 1.0.20210402163916_2C3D86
+  module_name: qa_bento
+  module_file: qa_bento.py
+env:
+  pip_packages:
+  - bentoml==0.12.0
+  - ignite-lume==1.9.3
+  conda_env:
+    name: bentoml-default-conda-env
+    dependencies: []
+  python_version: 3.6.9
+  docker_base_image: bentoml/model-server:0.12.0-py36
+apis:
+- name: _lume_api
+  docs: "\n        Runs a question-answering model based on Google's Electra transformer\
+    \ architecture\n        (https://huggingface.co/mrm8488/electra-small-finetuned-squadv2)\
+    \ on the text\n        associated with the specified LumeElements.\n        \n\
+    \        Args:\n            lume (Lume): The input Lume\n            element_type\
+    \ (str): The LumeElement type to run predictions on\n            output_element_type\
+    \ (str): The name of the new LumeElements created to start the prediction results\n\
+    \            questions (List[str]): The list of questions for the model\n    \
+    \        handle_impossible_answer (bool): Whether to allow the model to return\
+    \ a blank prediction (default: False)\n            \n        Returns:\n      \
+    \      Lume: A Lume with new LumeElements containing the highest-score prediction\
+    \ based on the provided\n            questions and text from the specified input\
+    \ LumeElements.\n        "
+  input_type: LumeInput
+  output_type: LumeOutput
+  mb_max_batch_size: 4000
+  mb_max_latency: 20000
+  batch: false
+  route: _lume_api
+  output_config:
+    cors: '*'
+- name: train_model
+  docs: "\n        Fine-tunes a question-answering model based on Google's Electra\
+    \ transformer architecture\n        (https://huggingface.co/mrm8488/electra-small-finetuned-squadv2)\
+    \ that has been trained on \n        Standfords SQuADv2 dataset using the question-answer\
+    \ pairs present in the provided LumeDataset.\n        \n        The fine-tuned\
+    \ model will be saved as a new Bento at the path specified.\n        \n      \
+    \  Args:\n            lume_dataset (LumeDataset): The input LumeDataset contain\
+    \ the Lumes with appropriate training data\n            output_path (str): Where\
+    \ to save the fine-tuned model as a new Bento package\n            element_type\
+    \ (Union[str,list]): The LumeElement type(s) containing the training data\n  \
+    \          question_attribute (str): The attribute in the LumeElements that contains\
+    \ the text of the\n                                      question associated with\
+    \ each answer. Each LumeElement must have the\n                              \
+    \        same attribute containing the question.\n            context_size (int):\
+    \ The approximate length of the total context surrounding each answer to be\n\
+    \                                used for training. The answer will always be\
+    \ centered in this context. (default: 200)\n            generate_negative_exmaples\
+    \ (bool): Whether to generate negative examples where the correct prediction\n\
+    \                                               is an empty string. (default:\
+    \ true)\n            negative_example_method (str): How to generate the negative\
+    \ examples (default: random)\n                                               random:\
+    \ The negative contexts will be chosen at random from\n                      \
+    \                             spans of text that do not overlap with the answer\
+    \ of the \n                                                   associated question\n\
+    \                                               question_word_overlap: The negative\
+    \ contexts will be chosen\n                                                  \
+    \ from spans of text that contain the most overlap with\n                    \
+    \                               non-stopwords (english) parts of the question.\
+    \ This produces\n                                                   more challenging\
+    \ negative examples for the model to learn,\n                                \
+    \                   and can improve performanc in cases where the model needs\
+    \ to\n                                                   differentiate between\
+    \ semantically similar, but unrelated, contexts.\n            validation_split\
+    \ (Union[float,list]): Either a fraction (0-1) for random splitting, or a list\
+    \ of\n                                                  Lume names used to created\
+    \ the the validation data.\n                                                 \
+    \ Splitting by Lume names is recommended when possible at it\n               \
+    \                                   provides the most control over the content\
+    \ of the validation set.\n                                                  (default:\
+    \ 0.1)\n            random_state (int): The random seed used during data preparation.\
+    \ Ensures some reproducability between\n                          different runs.\
+    \ (default: None)\n            kwargs: Any other keyword arguments to pass to\
+    \ the QuestionAnsweringArgs object from the\n                    simpletransformers\
+    \ library (https://simpletransformers.ai/docs/qa-model/#configuring-a-questionansweringmodel,\n\
+    \                    https://simpletransformers.ai/docs/usage/#configuring-a-simple-transformers-model),\
+    \ which\n                    is used to train the model.\n            \n     \
+    \   Returns:\n            Lume: A Lume with new LumeElements containing the highest-score\
+    \ prediction based on the provided\n            questions and text from the specified\
+    \ input LumeElements.\n        "
+  input_type: LumeInput
+  output_type: LumeOutput
+  mb_max_batch_size: 4000
+  mb_max_latency: 20000
+  batch: false
+  route: train_model
+  output_config:
+    cors: '*'
+artifacts:
+- name: qa_model
+  artifact_type: TransformersModelArtifact
+  metadata: {}
+- name: onnx_model
+  artifact_type: OnnxModelArtifact
+  metadata: {}

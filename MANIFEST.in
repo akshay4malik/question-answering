@@ -1,0 +1,2 @@
+include QAModel/bentoml.yml
+graft QAModel/artifacts
